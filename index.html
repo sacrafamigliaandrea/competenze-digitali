@@ -93,6 +93,13 @@ header.top .sotto{font-size:14px;opacity:.85;display:block;font-weight:400}
 /* ===== CONSEGNA ===== */
 .avviso{background:var(--blu-tenue);border-left:4px solid var(--blu);
   border-radius:0 10px 10px 0;padding:14px 18px;margin:18px 0}
+/* variante di richiamo: ambra, mai rosso, anche quando segnala qualcosa di mancante */
+.avviso-ambra{background:#fdf6e3;border-left-color:var(--ambra)}
+.mancanti{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.mancanti .q{width:38px;height:38px;border-radius:8px;border:1px solid var(--ambra-chiara);
+  background:#fff;color:var(--ambra);font-family:"Lexend",sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer}
+.mancanti .q:hover{background:var(--ambra);color:#fff}
 
 /* ===== MAPPA ===== */
 .mappa{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}
@@ -335,10 +342,11 @@ header.top .sotto{font-size:14px;opacity:.85;display:block;font-weight:400}
   overflow-wrap:anywhere}
 .mk .elenco-msg .hotspot .msg-riga{padding-right:56px}
 .mk .finto-link{color:var(--blu-chiaro);text-decoration:underline;overflow-wrap:anywhere}
-.mk .anteprima-link{display:flex;align-items:flex-start;gap:7px;margin-top:8px;padding:8px 9px;
-  border:1px solid var(--bordo);border-left:4px solid var(--ambra);border-radius:0 8px 8px 0;
-  background:#fdfaf3;font-size:12px;color:var(--testo-tenue);line-height:1.35}
-.mk .anteprima-link .vero{color:var(--testo);overflow-wrap:anywhere}
+/* le quattro righe del messaggio hanno tutte una riga di dettaglio, con lo stesso peso
+   visivo: nessun contenitore, nessun colore. Evidenziarne una sola faceva sì che chi
+   scorreva senza leggere toccasse quella, senza sapere che cos'è un dominio. */
+.mk .dettaglio-msg{display:block;margin-top:6px;font-size:12px;color:var(--testo-tenue);
+  line-height:1.35;overflow-wrap:anywhere}
 .mk .nota-gesto{font-size:11px;color:var(--testo-tenue);padding:10px 12px 0;line-height:1.35;
   margin:0}
 
@@ -383,6 +391,39 @@ header.top .sotto{font-size:14px;opacity:.85;display:block;font-weight:400}
 /* la sequenza è uno span (dentro un button si annidano solo span) ma contiene un <ol>:
    lasciata inline, la cornice si spezzava in frammenti a metà delle righe */
 .mk .sequenza{display:block}
+
+/* ===== RESTITUZIONE ===== */
+/* i quattro livelli: verde solo per Avanzato, ambra per il più basso. Mai il rosso. */
+.livello{display:inline-block;font-family:"Lexend",sans-serif;font-weight:700;
+  padding:6px 16px;border-radius:99px;color:#fff}
+.livello.av{background:var(--verde)}
+.livello.in{background:var(--blu)}
+.livello.ba{background:var(--blu-chiaro)}
+.livello.pa{background:var(--ambra)}
+.livello-grande{margin:18px 0;font-size:24px}
+.livello-grande .livello{font-size:24px;padding:10px 26px}
+.aree{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.area-box{border:1px solid var(--bordo);border-radius:12px;padding:16px}
+.area-box h3{font-size:16px;margin-bottom:10px}
+.dettaglio{font-size:15px;color:var(--testo-tenue);margin:10px 0 0}
+.nota{font-size:16px;color:var(--testo-tenue);margin-top:18px}
+.rev{border-top:1px solid var(--bordo);padding-top:22px;margin-top:22px}
+/* .tag/.domanda/.inquadramento sono definiti sotto .quesito: nella revisione il
+   contenitore è .rev, quindi le regole vanno ripetute qui o il blocco perde lo stile */
+.rev .tag{display:inline-block;background:var(--blu-tenue);color:var(--blu);
+  font-family:"Lexend",sans-serif;font-size:13px;font-weight:500;
+  padding:4px 10px;border-radius:99px;margin-bottom:10px}
+.rev .domanda{font-size:20px;font-weight:700;margin:6px 0 10px}
+.rev .inquadramento{background:#fbfcfe;border:1px solid var(--bordo);
+  border-radius:10px;padding:12px 14px;margin:8px 0;font-size:17px}
+.tua{background:#fdf6e3;border-left:4px solid var(--ambra);border-radius:0 10px 10px 0;
+  padding:12px 16px}
+.tua .perche{color:var(--testo-tenue);font-size:17px}
+.tua-vuota{font-style:italic}
+.giusta{background:#eef7f1;border-left:4px solid var(--verde);border-radius:0 10px 10px 0;
+  padding:12px 16px}
+.spiega{font-size:17px}
+.ricomincia{border-top:1px solid var(--bordo);margin-top:22px;padding-top:22px}
 </style>
 </head>
 <body>
@@ -415,8 +456,8 @@ var ITEMS = [
   stimolo:{tipo:"svg", render:"svgTreAttori", titolo:"Chi sta nella stanza"},
   opzioni:[
     "Chi li pubblica lo fa per passione, senza alcun interesse economico.",
-    "Sono finanziati dalla pubblicità mirata mostrata agli utenti.",
-    "Internet è uno spazio pubblico: per legge i contenuti devono essere gratuiti.",
+    "Sono finanziati dalla pubblicità mirata mostrata a chi li guarda.",
+    "Internet è uno spazio pubblico: per legge i contenuti sono gratuiti.",
     "Li paga lo Stato attraverso le tasse sulla connessione a internet."
   ],
   corretta:1,
@@ -435,10 +476,10 @@ var ITEMS = [
   consegna:"Devi raccogliere la preferenza di tutti e ventidue i compagni di classe su tre proposte per l'uscita didattica, e poi contare quanti hanno scelto ciascuna. Quale delle quattro app sullo schermo ti serve?",
   stimolo:{tipo:"mockup", render:"mkAppIpad", titolo:"Le app sul tuo iPad", hotspot:true},
   opzioni:[
-    "Moduli: si prepara un questionario, ognuno risponde dal proprio iPad e le risposte arrivano già raccolte in una tabella.",
+    "Moduli: si prepara un questionario e le risposte arrivano già raccolte in una tabella.",
     "Messaggi: si scrive la domanda nella chat di classe e ognuno risponde a voce sua nel flusso.",
     "Keynote: si prepara una presentazione con la domanda e le tre proposte e la si mostra alla classe.",
-    "Note: si apre una nota e si scrivono a mano le risposte man mano che arrivano."
+    "Note: si apre una nota e si scrivono a mano le risposte man mano che arrivano dai compagni."
   ],
   corretta:0,
   misconcetti:[
@@ -456,19 +497,19 @@ var ITEMS = [
   consegna:"Per la ricerca di scienze devi capire perché in autunno le foglie degli alberi cambiano colore. Hai davanti la barra di ricerca vuota: quale formulazione ti porta più vicino a quello che cerchi?",
   stimolo:{tipo:"mockup", render:"mkRicercaSafari", titolo:"La ricerca da impostare"},
   opzioni:[
-    "Mi puoi spiegare per favore perché in autunno le foglie degli alberi diventano gialle?",
-    "foglie autunno",
+    "Mi spieghi per favore perché le foglie diventano gialle?",
+    "foglie autunno alberi colori stagioni natura bosco",
     "perché foglie cambiano colore autunno clorofilla",
     "clorofilla fotosintesi alghe verdi acqua dolce"
   ],
   corretta:2,
   misconcetti:[
     "Tratta il motore di ricerca come una persona a cui rivolgersi: le formule di cortesia e i pronomi non aggiungono nulla, riempiono la ricerca di parole che non selezionano niente.",
-    "Si ferma a parole troppo ampie: con due termini così generici arrivano poesie, ricette e foto autunnali, e il concetto che serve non compare da nessuna parte.",
+    "Si ferma a parole troppo ampie: i termini sono tanti, ma tutti generici, e fanno arrivare poesie, ricette e foto autunnali senza il concetto che serve.",
     null,
     "Prende parole tecniche a caso: la clorofilla c'entra, ma 'alghe' e 'acqua dolce' spostano la ricerca su un tema completamente diverso."
   ],
-  feedback:"Una buona ricerca non è né la più lunga né la più breve: è quella fatta di parole che restringono davvero il campo. Qui servono il fenomeno (foglie, colore, autunno) e il termine che porta alla spiegazione (clorofilla). La domanda discorsiva aggiunge parole inutili, due parole generiche non bastano, e parole tecniche fuori tema portano lontano anche se suonano competenti."
+  feedback:"Una buona ricerca non è né la più lunga né la più breve: è quella fatta di parole che restringono davvero il campo. Qui servono il fenomeno (foglie, colore, autunno) e il termine che porta alla spiegazione (clorofilla). La domanda discorsiva aggiunge parole inutili, un elenco di parole generiche non basta, e parole tecniche fuori tema portano lontano anche se suonano competenti."
 },
 
 {
@@ -477,8 +518,8 @@ var ITEMS = [
   consegna:"Nel riquadro accanto: si parte da un materiale reale, si passa attraverso un'elaborazione, si arriva a un risultato che poi circola in rete. Che cos'è un deepfake?",
   stimolo:{tipo:"svg", render:"svgCatenaDeepfake", titolo:"Da che cosa si parte, dove si arriva"},
   opzioni:[
-    "Un video o un audio in cui il volto o la voce di una persona reale sono ricostruiti artificialmente, per farle dire o fare cose che non ha mai detto né fatto.",
-    "Una notizia inventata di sana pianta, scritta e diffusa perché venga creduta vera.",
+    "Un video o un audio in cui il volto o la voce di una persona reale sono ricostruiti artificialmente.",
+    "Una notizia inventata di sana pianta, scritta e diffusa in rete perché venga creduta vera.",
     "Un profilo social aperto da qualcun altro usando il nome e le fotografie di una persona reale.",
     "Un video autentico da cui sono state tagliate alcune parti, in modo da cambiarne il senso."
   ],
@@ -498,10 +539,10 @@ var ITEMS = [
   consegna:"Vuoi citare questo articolo nella tua ricerca, ma prima vuoi capire quanto puoi fidarti di chi lo ha scritto. Fra questi passi, qual è quello che ti dice davvero qualcosa sull'autore?",
   stimolo:{tipo:"mockup", render:"mkArticoloFirma", titolo:"La pagina che hai trovato"},
   opzioni:[
-    "Cercare chi è la persona che firma l'articolo: che lavoro fa, di che cosa si occupa, che cos'altro ha scritto.",
-    "Guardare quante volte l'articolo è stato condiviso e commentato.",
+    "Cercare chi è la persona che firma l'articolo e di che cosa si occupa.",
+    "Guardare quante volte l'articolo è stato condiviso e commentato in rete.",
     "Controllare che il sito sia curato nella grafica e senza errori di scrittura.",
-    "Verificare che la data di pubblicazione sia abbastanza recente."
+    "Verificare che la data di pubblicazione dell'articolo sia abbastanza recente."
   ],
   corretta:0,
   misconcetti:[
@@ -540,10 +581,10 @@ var ITEMS = [
   consegna:"Il grafico accanto segue nel tempo due contenuti collegati: la curva continua è una notizia falsa diventata virale, la curva tratteggiata è la smentita pubblicata dopo la verifica dei fatti. Che cosa mostra questo andamento?",
   stimolo:{tipo:"svg", render:"svgDueCurve", titolo:"Due contenuti nel tempo"},
   opzioni:[
-    "Che quando la smentita arriva, la notizia falsa ha già raggiunto molte più persone di quante ne leggeranno mai la correzione.",
+    "Che quando la smentita arriva, la notizia falsa ha già raggiunto molte più persone della correzione.",
     "Che la smentita rimette le cose a posto: alla fine chi aveva visto la notizia falsa sa che era falsa.",
-    "Che la notizia falsa è scesa da sola, quindi la smentita non ha avuto alcun effetto.",
-    "Che la smentita resta più bassa perché il tema interessava poco: chi aveva condiviso la notizia falsa non ci teneva davvero."
+    "Che la notizia falsa è scesa da sola nel giro di qualche giorno, quindi la smentita non è servita.",
+    "Che la smentita resta più bassa perché il tema interessava poco a chi aveva condiviso la notizia."
   ],
   corretta:0,
   misconcetti:[
@@ -562,7 +603,7 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkFileCartelle", titolo:"Le cartelle sul tuo iPad", hotspot:true},
   opzioni:[
     "Su questo iPad — il livello più esterno, dove i file restano senza una collocazione.",
-    "Scuola > Scienze > Relazione biodiversità — la cartella del lavoro in corso, dentro la materia.",
+    "Scuola > Scienze > Relazione biodiversità — la cartella del lavoro in corso.",
     "Scuola > Storia — una cartella ordinata dentro la scuola, ma di un'altra materia.",
     "Download — la cartella in cui arrivano i file scaricati da internet."
   ],
@@ -580,13 +621,13 @@ var ITEMS = [
 
 {
   id:9, area:2, dim:"2.3", oggetto:"Conoscenza", livello:"Base", origine:"G13 q7",
-  inquadramento:"Per accedere a certi servizi online dello Stato — il fascicolo sanitario, la scuola, il Comune — non basta una password qualsiasi: serve un'identità verificata, cioè un modo per dimostrare davvero chi sei. In Italia esistono <strong>SPID</strong> e <strong>CIE ID</strong>, quest'ultimo legato alla carta d'identità elettronica. Li ottengono le persone maggiorenni, ma tra pochi anni serviranno anche a te.",
-  consegna:"Nel riquadro accanto una persona passa attraverso un controllo prima di arrivare ai servizi. A che cosa serve, in sostanza, un sistema come SPID o CIE ID?",
+  inquadramento:"Per accedere a certi servizi online dello Stato — il fascicolo sanitario, la scuola, il Comune — non basta un account qualsiasi, aperto in un minuto scegliendosi una password. In Italia per entrare in quei servizi si usano <strong>SPID</strong> e <strong>CIE ID</strong>, quest'ultimo legato alla carta d'identità elettronica. Si ottengono soltanto di persona o con un riconoscimento a distanza, e li rilasciano a chi è maggiorenne: tra pochi anni serviranno anche a te.",
+  consegna:"Nel riquadro accanto una persona passa attraverso un controllo prima di arrivare ai servizi. Ragionando su che cosa può servire quel passaggio, a che cosa serve un sistema come SPID o CIE ID?",
   stimolo:{tipo:"svg", render:"svgIdentitaVerificata", titolo:"Il passaggio prima dei servizi"},
   opzioni:[
     "A creare un nome utente e una password validi su tutti i siti italiani.",
     "A proteggere il dispositivo dai virus e dai tentativi di truffa mentre navighi.",
-    "A dimostrare in modo affidabile che sei davvero tu, così i servizi pubblici possono aprirsi.",
+    "A dimostrare in modo affidabile che sei davvero tu davanti ai servizi pubblici.",
     "A pagare online tasse e bollette senza dover inserire i dati di una carta."
   ],
   corretta:2,
@@ -606,7 +647,7 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkModalitaPages", titolo:"Il menu delle modalità", hotspot:true},
   opzioni:[
     "Modifica — si scrive dentro al documento e il testo cambia subito per tutti.",
-    "Suggerimento — le riscritture compaiono come proposte, e l'autore le accetta o le rifiuta una per una.",
+    "Suggerimento — le riscritture restano proposte, che l'autore accetta o rifiuta.",
     "Commento — si lascia una nota a margine, ma il testo resta esattamente com'è.",
     "Visualizzazione — si legge il documento e basta, senza poterci intervenire."
   ],
@@ -626,8 +667,8 @@ var ITEMS = [
   consegna:"Sei a casa la sera. Il professore di tecnologia ha chiesto la foto del modulo firmato dai tuoi genitori e deve poterla ritrovare fra un mese, quando organizzerà l'uscita. Fra i quattro canali del riquadro, quale usi?",
   stimolo:{tipo:"mockup", render:"mkQuattroCanali", titolo:"I canali che hai a disposizione", hotspot:true},
   opzioni:[
-    "La chat di classe, dove ci sono i ventidue compagni.",
-    "La mail all'indirizzo del professore, con la foto allegata.",
+    "La chat di classe, dove ci sono tutti e ventidue i compagni.",
+    "La mail al professore, con la foto del modulo in allegato.",
     "AirDrop, che invia il file ai dispositivi vicini.",
     "La bacheca digitale della scuola, visibile a tutti."
   ],
@@ -647,8 +688,8 @@ var ITEMS = [
   consegna:"Nel riquadro accanto cose molto diverse fatte online in giorni diversi convergono tutte verso lo stesso punto. Che cos'è l'identità digitale di una persona?",
   stimolo:{tipo:"svg", render:"svgTracceIdentita", titolo:"Che cosa converge"},
   opzioni:[
-    "L'insieme delle tracce che una persona lascia online e che, messe insieme, dicono chi è, che cosa fa e che cosa le interessa.",
-    "L'insieme dei nomi utente e delle password con cui accede ai propri account.",
+    "L'insieme delle tracce che una persona lascia online e che, messe insieme, dicono chi è.",
+    "L'insieme dei nomi utente e delle password con cui accede ai propri account online.",
     "Il profilo pubblico che ha su un social network, con la foto e la descrizione che ha scelto.",
     "La versione elettronica del documento d'identità, con i dati anagrafici registrati."
   ],
@@ -668,10 +709,10 @@ var ITEMS = [
   consegna:"Venerdì eri assente e non sai che cosa è stato assegnato per il lavoro di storia. Nel riquadro ci sono quattro bozze dello stesso messaggio al professore: quale mandi?",
   stimolo:{tipo:"mockup", render:"mkBozzeMessaggio", titolo:"Quattro bozze dello stesso messaggio"},
   opzioni:[
-    "La bozza 1, quella che comincia con «Ciao prof! venerdì non c'ero…»",
+    "La bozza 1, quella che comincia con «Ciao prof! venerdì non c'ero e non so…»",
     "La bozza 2, quella che comincia con «Buongiorno professore, avrei una domanda…»",
     "La bozza 3, quella che comincia con «Buongiorno professore, sono Giulia Bertoli della 3ªB…»",
-    "La bozza 4, quella che comincia con «Egregio e stimatissimo Professore…»"
+    "La bozza 4, quella che comincia con «Egregio e stimatissimo Professore, mi permetto…»"
   ],
   corretta:2,
   misconcetti:[
@@ -689,9 +730,9 @@ var ITEMS = [
   consegna:"Hai trovato il grafico del riquadro su un sito di divulgazione e vuoi ricondividerlo nel gruppo della classe. In che modo lo pubblichi?",
   stimolo:{tipo:"mockup", render:"mkAttribuzione", titolo:"Il contenuto che vuoi ricondividere"},
   opzioni:[
-    "Pubblicando l'immagine così com'è, senza scrivere altro.",
-    "Pubblicando l'immagine e scrivendo sotto «trovato su internet».",
-    "Pubblicando l'immagine con il nome di chi l'ha realizzata, il sito e il link alla pagina.",
+    "Pubblicando l'immagine così com'è, senza scrivere niente accanto ad essa.",
+    "Pubblicando l'immagine e scrivendo sotto soltanto «trovato su internet».",
+    "Pubblicando l'immagine con il nome dell'autore, il sito e il link alla pagina.",
     "Rifacendo il grafico con gli stessi dati e altri colori, e pubblicandolo come lavoro tuo."
   ],
   corretta:2,
@@ -711,7 +752,7 @@ var ITEMS = [
   stimolo:{tipo:"svg", render:"svgBannerCookie", titolo:"Il riquadro che compare"},
   opzioni:[
     "Accetto tutti i cookie: senza di essi il sito non funziona e la pagina non si vede.",
-    "Rifiuto i cookie non essenziali: la pagina si legge lo stesso e il sito smette di seguirmi anche altrove.",
+    "Rifiuto i cookie non essenziali: la pagina si legge lo stesso e nessuno mi segue altrove.",
     "Chiudo il riquadro senza scegliere: se non scelgo, nessun cookie viene installato.",
     "Accetto tutto e poi cancello la cronologia: così sparisce anche quello che hanno raccolto."
   ],
@@ -732,8 +773,8 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkPermessiCalendario", titolo:"Le autorizzazioni del calendario", hotspot:true},
   opzioni:[
     "Vedere solo libero od occupato — i compagni vedono che quel giorno c'è qualcosa, ma non che cosa.",
-    "Vedere tutti i dettagli — i compagni leggono titolo, ora e luogo di ogni evento, senza poter cambiare nulla.",
-    "Modificare gli eventi — i compagni possono spostare, cambiare e cancellare le date.",
+    "Vedere tutti i dettagli — i compagni leggono titolo, ora e luogo di ogni evento del calendario.",
+    "Modificare gli eventi — i compagni possono spostare, cambiare e cancellare le date fissate.",
     "Modificare e gestire la condivisione — i compagni possono anche far entrare altre persone nel calendario."
   ],
   corretta:1,
@@ -750,9 +791,10 @@ var ITEMS = [
 
 {
   id:17, area:3, dim:"3.1", oggetto:"Conoscenza", livello:"Base", origine:"G13 q13",
-  inquadramento:"Ci sono oggetti che non sembrano computer ma lo sono: un termostato che si regola dal telefono, un orologio che conta i passi, un sensore che avvisa quando manca l'acqua. Hanno dentro un piccolo sensore, si collegano a una rete e scambiano dati. L'insieme di questi oggetti connessi si chiama <strong>Internet delle Cose</strong> (in inglese <em>Internet of Things</em>, IoT).",
-  consegna:"Sulla base di quanto hai appena letto, e guardando il riquadro accanto: quale di queste descrizioni corrisponde all'Internet delle Cose?",
-  stimolo:{tipo:"svg", render:"svgOggettiConnessi", titolo:"Oggetti che stanno su una rete"},
+  inquadramento:"Ci sono oggetti che non sembrano computer ma lo sono: un termostato che si regola dal telefono, un orologio che conta i passi, un contatore che avvisa quando l'acqua sta finendo. L'insieme di questi oggetti si chiama <strong>Internet delle Cose</strong> (in inglese <em>Internet of Things</em>, IoT).",
+  consegna:"Guarda il riquadro accanto e chiediti che cosa hanno in comune quegli oggetti, così diversi fra loro. Quale di queste descrizioni corrisponde all'Internet delle Cose?",
+  /* il titolo non nomina né «rete» né «dati»: sono due delle tre parole della corretta */
+  stimolo:{tipo:"svg", render:"svgOggettiConnessi", titolo:"Quattro cose molto diverse fra loro"},
   opzioni:[
     "Lo spazio in rete dove si archiviano file e fotografie, per ritrovarli da qualunque dispositivo.",
     "Oggetti di uso quotidiano che contengono un sensore, si collegano a una rete e si scambiano dati.",
@@ -766,7 +808,7 @@ var ITEMS = [
     "Scambia il trasferimento di contenuti con gli oggetti che li producono: nello streaming la rete porta a te un video già fatto, qui la rete collega cose che misurano e segnalano.",
     "Attribuisce all'Internet delle Cose la capacità di ragionare: un sensore che rileva la temperatura non elabora né inventa niente, si limita a misurare e a trasmettere."
   ],
-  feedback:"Nel riquadro gli oggetti sono tutti diversi — un orologio, un termostato, una lampada, un sensore — e tutti collegati allo stesso punto. È questo che li rende Internet delle Cose: sono cose ordinarie che hanno dentro un sensore e una connessione, e che mandano dati senza che nessuno stia lì a farlo. L'archiviazione in rete, lo streaming e l'intelligenza artificiale sono tre cose reali e diverse fra loro, ma nessuna delle tre riguarda oggetti fisici che misurano il mondo e lo raccontano a una rete."
+  feedback:"Nel riquadro gli oggetti sono tutti diversi — un orologio, un termostato, una lampada, un contatore dell'acqua — e tutti collegati allo stesso punto. È questo che li rende Internet delle Cose: sono cose ordinarie che hanno dentro un sensore e una connessione, e che mandano dati senza che nessuno stia lì a farlo. L'archiviazione in rete, lo streaming e l'intelligenza artificiale sono tre cose reali e diverse fra loro, ma nessuna delle tre riguarda oggetti fisici che misurano il mondo e lo raccontano a una rete."
 },
 
 {
@@ -778,7 +820,7 @@ var ITEMS = [
     "Pages — il formato in cui il documento è stato scritto.",
     "PDF — il formato che fissa l'impaginazione così com'è.",
     "Word — il formato di un altro programma di scrittura.",
-    "Testo semplice — il formato che contiene solo i caratteri, senza impaginazione."
+    "Testo semplice — soltanto i caratteri, senza impaginazione."
   ],
   corretta:1,
   misconcetti:[
@@ -796,15 +838,15 @@ var ITEMS = [
   consegna:"Il drone del riquadro parte dalla casella di partenza e deve arrivare alla piazzola di atterraggio. Si sposta una casella alla volta e non può attraversare le caselle occupate dagli ostacoli. Quale sequenza di istruzioni lo porta a destinazione?",
   stimolo:{tipo:"svg", render:"svgGrigliaDrone", titolo:"La griglia di volo"},
   opzioni:[
-    "4 passi a destra, poi 3 passi in alto.",
-    "3 passi in alto, poi 4 passi a destra.",
-    "1 passo in alto, poi 4 passi a destra, poi 2 passi in alto.",
-    "1 passo in alto, poi 3 passi a destra, poi 2 passi in alto."
+    "Prima 4 passi a destra, poi 3 passi in alto.",
+    "Prima 3 passi in alto, poi 4 passi a destra.",
+    "Prima 1 passo in alto, poi 4 a destra, poi 2 in alto.",
+    "Prima 1 passo in alto, poi 3 a destra, poi 2 in alto."
   ],
   corretta:2,
   misconcetti:[
     "Prende la strada più diretta contando solo le caselle che separano partenza e arrivo, senza guardare che cosa c'è in mezzo: sulla prima riga il drone si trova un ostacolo davanti e si ferma lì.",
-    "Inverte l'ordine dei due tratti dando per scontato che sia indifferente: su una griglia libera lo sarebbe, ma con gli ostacoli l'ordine cambia il percorso, e questo va a sbattere sulla colonna di sinistra.",
+    "Inverte l'ordine dei due tratti dando per scontato che sia indifferente: su una griglia libera lo sarebbe, ma con gli ostacoli l'ordine cambia tutto. Qui la salita fila liscia, poi il drone trova un ostacolo appena prova a spostarsi a destra.",
     null,
     "Sbaglia il conteggio di un passo solo sul tratto orizzontale: il percorso è libero per tutta la sua lunghezza, ma il drone si ferma una casella prima della piazzola."
   ],
@@ -817,7 +859,7 @@ var ITEMS = [
   consegna:"Una tua compagna ipovedente legge le pagine con uno strumento che gliele dice ad alta voce. Nella pagina del riquadro c'è una fotografia. Che cosa deve aver preparato chi ha costruito la pagina, perché lei sappia che cosa quella fotografia mostra?",
   stimolo:{tipo:"svg", render:"svgTestoAlternativo", titolo:"Una pagina che viene letta ad alta voce"},
   opzioni:[
-    "Una descrizione scritta dell'immagine, collegata all'immagine stessa e destinata a chi non può vederla.",
+    "Una descrizione scritta dell'immagine, collegata a essa e destinata a chi non può vederla.",
     "La didascalia stampata sotto la fotografia, che lo strumento legge insieme al resto della pagina.",
     "Un nome del file che descriva il contenuto della fotografia invece di essere una sigla.",
     "La possibilità di ingrandire la fotografia toccandola, per guardarne meglio i particolari."
@@ -838,8 +880,8 @@ var ITEMS = [
   consegna:"Apri il catalogo per vedere un documentario e compare l'avviso del riquadro. Un tuo cugino che vive in Germania ti dice che in questo momento lo sta guardando, sullo stesso servizio. Qual è la spiegazione più probabile?",
   stimolo:{tipo:"mockup", render:"mkAvvisoNonDisponibile", titolo:"L'avviso che compare"},
   opzioni:[
-    "La connessione a internet non è abbastanza veloce per un contenuto di quella durata.",
-    "Chi ha prodotto il documentario ha venduto i diritti di distribuzione Paese per Paese, e per l'Italia non li ha ancora venduti a questo servizio.",
+    "La connessione a internet non è abbastanza veloce per riprodurre un contenuto così lungo.",
+    "Chi lo ha prodotto ne ha venduto i diritti Paese per Paese, e in Italia non a questo servizio.",
     "L'abbonamento al servizio è scaduto e va rinnovato prima di poter riprendere a guardare.",
     "Il dispositivo che stai usando non è compatibile con il formato in cui è registrato il documentario."
   ],
@@ -860,15 +902,15 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkDueVersioniPagina", titolo:"La stessa pagina in due versioni"},
   opzioni:[
     "La versione A, perché il grigio chiaro è più riposante per gli occhi di un testo molto scuro.",
-    "La versione B, perché il testo si stacca nettamente dallo sfondo e i suoi titoli sono davvero titoli, così anche chi ascolta la pagina può orientarsi.",
-    "La versione B, perché ha i caratteri più grandi e quindi si legge meglio anche da lontano.",
+    "La versione B, perché il testo si stacca dallo sfondo e i titoli sono davvero titoli.",
+    "La versione B, perché il nero sul bianco è la combinazione che si usa nei libri.",
     "Sono equivalenti: cambia solo l'aspetto grafico, il contenuto scritto è esattamente lo stesso."
   ],
   corretta:1,
   misconcetti:[
     "Confonde il tenue con il riposante: un grigio chiaro su bianco sembra delicato, ma costringe l'occhio a lavorare di più per separare le lettere dallo sfondo, e con poca luce o su uno schermo al sole diventa illeggibile.",
     null,
-    "Riduce l'accessibilità a una questione di dimensioni: le due versioni hanno lo stesso corpo di carattere, e quello che cambia è quanto il testo si stacca dallo sfondo e come la pagina è costruita sotto.",
+    "Arriva alla versione giusta per la ragione sbagliata: il contrasto non conta perché è un'abitudine tipografica, ma perché senza di esso una parte delle persone non separa le lettere dallo sfondo. E la differenza decisiva, la struttura dei titoli, guardando la pagina non si vede.",
     "Tratta la forma come una scelta estetica indifferente: qui la forma è proprio ciò che rende una pagina leggibile o no, e chi ha poca vista o ascolta la pagina non trova le stesse cose nelle due versioni."
   ],
   feedback:"La differenza che si vede è il contrasto: nella versione A il testo è appena più scuro dello sfondo, e già così una parte delle persone smette di leggerla. La differenza che non si vede è sotto: nella versione A i titoli sono solo testo scritto grande e in grassetto, mentre nella versione B sono marcati come titoli. La distinzione conta perché uno strumento che legge la pagina ad alta voce sa saltare da un titolo all'altro solo se i titoli sono veri: davanti alla versione A si trova una sola colata di testo da ascoltare dall'inizio. Rendere una pagina utilizzabile da più persone costa due attenzioni in fase di scrittura, non un lavoro in più alla fine."
@@ -883,14 +925,14 @@ var ITEMS = [
     "Venderne delle copie stampate a un mercatino, scrivendo accanto il nome di chi l'ha realizzata.",
     "Inserirla nel volantino pubblicitario di un negozio, senza scrivere da chi è stata realizzata.",
     "Tagliarne una parte e ripubblicare l'immagine modificata, indicando il nome di chi l'ha realizzata.",
-    "Salvarla sul proprio iPad e usarla come sfondo dello schermo, senza scrivere nulla da nessuna parte."
+    "Salvarla sul proprio iPad e usarla come sfondo dello schermo, senza mostrarla né inviarla a nessuno."
   ],
   corretta:1,
   misconcetti:[
     "Dà per scontato che una licenza libera escluda sempre il guadagno: questa licenza non pone limiti allo scopo per cui l'opera viene usata, e vendere copie non è di per sé una violazione.",
     null,
     "Crede che la licenza protegga l'opera dalle modifiche: questa licenza permette anche di trasformarla, purché resti indicato da chi è nata.",
-    "Estende a casa propria un obbligo che nasce nel momento in cui si distribuisce: usare un'immagine solo per sé, senza mostrarla a nessuno, non è ricondividerla."
+    "Qui l'immagine non esce dal dispositivo: non viene mostrata, inviata né pubblicata. L'obbligo di indicare l'autore riguarda la ricondivisione, e senza ricondivisione non c'è niente da indicare e a nessuno."
   ],
   feedback:"Questa licenza è quella che il suo autore usa per dire: prendetela, usatela, cambiatela pure. La condizione è una sola, ed è il simbolo della persona nel secondo cerchio — indicare sempre chi l'ha realizzata, ogni volta che l'opera viene ricondivisa. Vendere copie, modificare l'immagine, tenersela per sé: nessuna di queste tre cose la viola. Metterla su un volantino togliendo il nome dell'autore sì, e non perché ci sia di mezzo del denaro, ma perché l'unica cosa che l'autore aveva chiesto è stata cancellata."
 },
@@ -903,8 +945,8 @@ var ITEMS = [
   opzioni:[
     "Scegliendo la fonte che sembra più affidabile e riportandone il contenuto nella scheda.",
     "Copiando i tre testi uno dopo l'altro nella scheda, nell'ordine in cui li hai trovati.",
-    "Riassumendo ciascuna fonte in un paragrafo a sé, un paragrafo per ogni fonte.",
-    "Confrontando le tre fonti, cercando su che cosa concordano e su che cosa no, e scrivendo un testo nuovo che risponda alla domanda citando da dove viene ciascuna informazione."
+    "Riassumendo ciascuna fonte in un paragrafo a sé, un paragrafo per ognuna delle tre.",
+    "Confrontando le tre fonti e scrivendo un testo nuovo che risponda alla domanda citando ciascuna."
   ],
   corretta:3,
   misconcetti:[
@@ -924,10 +966,10 @@ var ITEMS = [
   consegna:"Prima di poter usare un'app nuova, sull'iPad compare il documento del riquadro accanto: è diviso in sezioni, ognuna con il suo titolo. A che cosa serve un'informativa sulla privacy?",
   stimolo:{tipo:"svg", render:"svgInformativaPrivacy", titolo:"Il documento che compare prima di andare avanti"},
   opzioni:[
-    "A dichiarare quali dati personali il servizio raccoglie, per quali scopi li usa e a chi li comunica.",
+    "A dichiarare quali dati il servizio raccoglie, per quali scopi e a chi li comunica.",
     "A proteggere il dispositivo dai virus e dai programmi dannosi che possono arrivare dalla rete.",
-    "A garantire che il servizio non raccolga alcun dato personale su chi lo usa.",
-    "A dare al servizio il permesso di installarsi sul dispositivo."
+    "A garantire che il servizio non raccolga nessun dato personale su chi lo utilizza.",
+    "A dare al servizio il permesso di installarsi sul dispositivo e di funzionare."
   ],
   corretta:0,
   misconcetti:[
@@ -945,10 +987,10 @@ var ITEMS = [
   consegna:"Durante la gita usi sull'iPad l'app delle mappe per seguire a piedi il percorso fino al museo: mentre cammini l'app deve sapere dove sei, altrimenti non può mostrarti se stai andando nella direzione giusta. Nella giornata la aprirai e la chiuderai diverse volte. Compare la richiesta del riquadro: quale scelta tocchi?",
   stimolo:{tipo:"mockup", render:"mkPermessoPosizione", titolo:"La richiesta che compare sullo schermo", hotspot:true},
   opzioni:[
-    "Consenti sempre.",
-    "Consenti mentre usi l'app.",
-    "Consenti una volta sola.",
-    "Non consentire."
+    "Consenti sempre l'accesso alla posizione.",
+    "Consenti l'accesso mentre usi l'app.",
+    "Consenti l'accesso una volta sola.",
+    "Non consentire l'accesso alla posizione."
   ],
   corretta:1,
   misconcetti:[
@@ -967,8 +1009,8 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkMessaggioSospetto", titolo:"Il messaggio arrivato stamattina", hotspot:true},
   opzioni:[
     "L'indirizzo del mittente, che somiglia a quello del registro elettronico ma non è identico.",
-    "L'annuncio che l'accesso verrà bloccato entro ventiquattro ore.",
-    "Il collegamento: il testo mostra l'indirizzo del registro, ma l'anteprima rivela che porta a un sito diverso.",
+    "L'annuncio che l'accesso verrà bloccato entro ventiquattro ore dall'invio.",
+    "Il collegamento: il testo mostra l'indirizzo del registro, ma l'anteprima porta altrove.",
     "La richiesta di inserire nome utente e password per confermare l'account."
   ],
   corretta:2,
@@ -1008,9 +1050,9 @@ var ITEMS = [
   consegna:"Ti iscrivi online al laboratorio di robotica di un museo. Prima di inviare il modulo devi decidere che cosa fare delle due caselle di consenso del riquadro. Quale delle quattro combinazioni scegli?",
   stimolo:{tipo:"mockup", render:"mkModuloConsensi", titolo:"Il modulo di iscrizione, prima dell'invio", hotspot:true},
   opzioni:[
-    "Spunto entrambe le caselle.",
-    "Spunto solo la prima casella.",
-    "Spunto solo la seconda casella.",
+    "Spunto tutte e due le caselle.",
+    "Spunto soltanto la prima casella.",
+    "Spunto soltanto la seconda casella.",
     "Non spunto nessuna delle due caselle."
   ],
   corretta:1,
@@ -1029,10 +1071,10 @@ var ITEMS = [
   consegna:"La foto del riquadro l'hai scattata con il tuo iPad e stai per pubblicarla. Accanto all'immagine l'iPad conserva un pannello di informazioni che guardando la foto non si vedono. Che cosa può ricostruire, di te, chi scarica quel file?",
   stimolo:{tipo:"svg", render:"svgFotoDatiNascosti", titolo:"La foto e il pannello che le sta accanto"},
   opzioni:[
-    "Dove e quando è stata scattata, e con quale dispositivo: dati che viaggiano insieme all'immagine senza comparire in essa.",
+    "Dove e quando è stata scattata, e con quale dispositivo: dati che viaggiano con il file.",
     "Niente oltre a quello che si vede nell'immagine: una foto è soltanto l'insieme dei suoi punti colorati.",
-    "Niente, perché nel momento in cui una foto viene pubblicata quelle informazioni vengono eliminate automaticamente.",
-    "Soltanto informazioni sulla qualità dell'immagine, come la risoluzione e il peso del file."
+    "Niente, perché nel momento in cui una foto viene pubblicata quelle informazioni spariscono.",
+    "Soltanto informazioni sulla qualità dell'immagine, come la risoluzione, i colori e il peso."
   ],
   corretta:0,
   misconcetti:[
@@ -1046,11 +1088,11 @@ var ITEMS = [
 
 {
   id:31, area:4, dim:"4.1", oggetto:"Conoscenza", livello:"Avanzato", origine:"G13 q21",
-  inquadramento:"Un dispositivo collegato a internet riceve continuamente tentativi di connessione: alcuni sono legittimi, altri no. Il <strong>firewall</strong> è il componente che sta al confine fra il dispositivo e la rete e decide che cosa lasciare passare e che cosa bloccare, seguendo delle regole.",
-  consegna:"Sulla base di quanto hai appena letto, e guardando quello che succede al confine nel riquadro accanto: che cosa fa, esattamente, un firewall?",
+  inquadramento:"Un dispositivo collegato a internet riceve di continuo tentativi di contatto dall'esterno, giorno e notte, anche quando nessuno lo sta usando: alcuni vengono da servizi legittimi, altri no. Al confine fra il dispositivo e la rete c'è qualcosa che se ne occupa, e si chiama <strong>firewall</strong>.",
+  consegna:"Guarda che cosa arriva al confine nel riquadro accanto e ragiona su dove il firewall è collocato: che cosa fa, esattamente?",
   stimolo:{tipo:"svg", render:"svgFirewallConfine", titolo:"Che cosa succede al confine"},
   opzioni:[
-    "Esamina le connessioni in entrata e in uscita e, in base a delle regole, lascia passare quelle ammesse e ferma le altre.",
+    "Esamina le connessioni in entrata e in uscita e, in base a delle regole, decide che cosa passa.",
     "Individua i file già entrati nel dispositivo che risultano infetti e li rimuove o li isola.",
     "Conserva una copia dei dati del dispositivo, così che si possano recuperare se qualcosa va perduto.",
     "Rende illeggibili i contenuti che escono dal dispositivo, in modo che chi li intercetta non riesca a capirli."
@@ -1072,7 +1114,7 @@ var ITEMS = [
   stimolo:{tipo:"mockup", render:"mkSequenzaDueFattori", titolo:"Quattro sequenze a confronto", hotspot:true},
   opzioni:[
     "La sequenza che chiede il codice di conferma prima ancora di aver indicato un recapito a cui inviarlo.",
-    "La sequenza che indica un numero di telefono fidato, sceglie come ricevere il codice e poi lo inserisce per confermare.",
+    "La sequenza che indica un numero di telefono fidato e poi inserisce il codice per confermare.",
     "La sequenza che attiva la verifica senza indicare, in nessun passaggio, un recapito di sicurezza.",
     "La sequenza che come recapito del codice indica la casella di posta dello stesso Apple ID che si vuole proteggere."
   ],
@@ -1105,14 +1147,19 @@ function etichettaSvg(mostra, testo, x, y, ancora){
 STIMOLI.svgTreAttori = function(esplicativo){
   var e = function(testo, x, y, ancora){ return etichettaSvg(esplicativo, testo, x, y, ancora); };
 
-  function nodo(y, titolo, glifo){
+  function nodo(y, titolo, glifo, anonimo){
+    /* il terzo soggetto, in modalità prova, resta senza nome e con una sagoma neutra:
+       «inserzionista» è il nome tecnico di chi compra pubblicità, cioè la risposta */
+    var senzaNome = anonimo && !esplicativo;
     return '' +
     '<g>' +
       '<rect x="100" y="' + y + '" width="220" height="56" rx="12" ' +
-        'fill="#eef2fb" stroke="#123E90" stroke-width="2"/>' +
+        'fill="#eef2fb" stroke="#123E90" stroke-width="2"' +
+        (senzaNome ? ' stroke-dasharray="7 5"' : '') + '/>' +
       glifo +
-      '<text x="152" y="' + (y + 34) + '" font-family="Lexend, sans-serif" font-size="15" ' +
-        'font-weight="700" fill="#123E90">' + titolo + '</text>' +
+      (senzaNome ? '' :
+        '<text x="152" y="' + (y + 34) + '" font-family="Lexend, sans-serif" font-size="15" ' +
+          'font-weight="700" fill="#123E90">' + titolo + '</text>') +
     '</g>';
   }
 
@@ -1126,11 +1173,17 @@ STIMOLI.svgTreAttori = function(esplicativo){
       '<rect x="118" y="154" width="24" height="18" rx="3"/>' +
       '<path d="M124 178 h12"/><path d="M130 172 v6"/>' +
     '</g>';
-  var glifoInserzionista = '' +
-    '<g stroke="#123E90" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none">' +
-      '<path d="M118 282 h7 l12 -9 v30 l-12 -9 h-7 z"/>' +
-      '<path d="M141 282 a7 7 0 0 1 0 12"/>' +
-    '</g>';
+  /* in prova una sagoma neutra di persona; il megafono, che dice «annunci», solo dopo */
+  var glifoTerzo = esplicativo
+    ? '<g stroke="#123E90" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none">' +
+        '<path d="M118 282 h7 l12 -9 v30 l-12 -9 h-7 z"/>' +
+        '<path d="M141 282 a7 7 0 0 1 0 12"/>' +
+      '</g>'
+    : '<g fill="none" stroke="#5a6b7c" stroke-width="2.4" stroke-linecap="round" ' +
+        'stroke-dasharray="5 4">' +
+        '<circle cx="130" cy="278" r="7"/>' +
+        '<path d="M119 296 a11 11 0 0 1 22 0"/>' +
+      '</g>';
 
   function frecciaGiu(x, y1, y2){
     return '<path d="M' + x + ' ' + y1 + ' V' + (y2 - 8) + '" stroke="#1f5fc0" ' +
@@ -1146,11 +1199,13 @@ STIMOLI.svgTreAttori = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 340" role="img" aria-label="Tre soggetti collegati fra loro: utente, piattaforma, inserzionista">' +
+  '<svg viewBox="0 0 420 340" role="img" aria-label="' + (esplicativo
+      ? 'Tre soggetti collegati fra loro: utente, piattaforma, inserzionista'
+      : 'Tre soggetti collegati fra loro: l\'utente, la piattaforma e un terzo soggetto senza nome, che manda qualcosa alla piattaforma') + '">' +
     '<rect width="420" height="340" fill="#ffffff"/>' +
     nodo(24, 'Utente', glifoUtente) +
     nodo(142, 'Piattaforma', glifoPiattaforma) +
-    nodo(260, 'Inserzionista', glifoInserzionista) +
+    nodo(260, 'Inserzionista', glifoTerzo, true) +
     frecciaGiu(192, 84, 138) +
     frecciaSu(228, 138, 84) +
     frecciaSu(210, 256, 202) +
@@ -1538,6 +1593,31 @@ STIMOLI.svgTracceIdentita = function(esplicativo){
              'font-family="Atkinson Hyperlegible, sans-serif" font-size="13" fill="#16233a">' +
              testo + '</text>';
   }
+  /* traccia muta: in prova al posto del nome c'è solo un glifo. Cinque etichette scritte
+     erano l'enumerazione con cui la risposta corretta si formula; tre bastano a mostrare
+     che qualcosa converge, senza dettare le parole. */
+  function tracciaMuta(x, y, larghezza, testo, glifo){
+    if(esplicativo) return traccia(x, y, larghezza, testo);
+    return '<rect x="' + x + '" y="' + y + '" width="' + larghezza + '" height="34" rx="10" ' +
+             'fill="#eef2fb" stroke="#1f5fc0" stroke-width="1.6"/>' +
+           '<g transform="translate(' + (x + larghezza / 2 - 11) + ',' + (y + 6) + ')">' +
+             glifo + '</g>';
+  }
+  /* carrello e goccia-segnaposto: glifi generici, nessuno dei due nomina la traccia */
+  var glifoCarrello =
+    '<g fill="none" stroke="#1f5fc0" stroke-width="1.9" stroke-linecap="round" ' +
+      'stroke-linejoin="round">' +
+      '<path d="M1 2 h3.4 l3 12.2 h11.4"/>' +
+      '<path d="M6.6 5.2 h15.2 l-1.6 6.6 h-12"/>' +
+      '<circle cx="9" cy="19.4" r="1.9"/><circle cx="17.6" cy="19.4" r="1.9"/>' +
+    '</g>';
+  var glifoSegnaposto =
+    '<g fill="none" stroke="#1f5fc0" stroke-width="1.9" stroke-linecap="round" ' +
+      'stroke-linejoin="round">' +
+      '<path d="M11 21.4 C4.6 13.4 2.6 10.6 2.6 8.4 a8.4 8.4 0 0 1 16.8 0 ' +
+        'c0 2.2 -2 5 -8.4 13 z"/>' +
+      '<circle cx="11" cy="8.4" r="3.1"/>' +
+    '</g>';
   /* freccia da un punto verso un altro, con la punta calcolata sulla direzione */
   function verso(x1, y1, x2, y2){
     var dx = x2 - x1, dy = y2 - y1;
@@ -1554,13 +1634,15 @@ STIMOLI.svgTracceIdentita = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 400" role="img" aria-label="Cinque tracce lasciate online convergono verso una sagoma di persona">' +
+  '<svg viewBox="0 0 420 400" role="img" aria-label="' + (esplicativo
+      ? 'Cinque tracce lasciate online convergono verso una sagoma di persona: un commento, una foto, una ricerca, un acquisto, la posizione'
+      : 'Cinque riquadri convergono verso una sagoma di persona: tre portano scritto un commento, una foto, una ricerca; gli altri due solo un piccolo disegno') + '">' +
     '<rect width="420" height="400" fill="#ffffff"/>' +
     traccia(16, 24, 148, 'un commento') +
     traccia(256, 24, 148, 'una foto') +
     traccia(8, 178, 116, 'una ricerca') +
-    traccia(296, 178, 116, 'un acquisto') +
-    traccia(136, 306, 148, 'la posizione') +
+    tracciaMuta(296, 178, 116, 'un acquisto', glifoCarrello) +
+    tracciaMuta(136, 306, 148, 'la posizione', glifoSegnaposto) +
     /* al centro: una sagoma tratteggiata, senza nome */
     '<rect x="150" y="120" width="120" height="126" rx="14" fill="#f6f8fc" stroke="#5a6b7c" ' +
       'stroke-width="1.6" stroke-dasharray="6 5"/>' +
@@ -1660,15 +1742,15 @@ STIMOLI.mkQuattroCanali = function(esplicativo, sceltaCorrente){
     {logico:0, nome:"Chat di classe", icona:"chat-gruppo",
      dest:"arriva ai ventidue compagni insieme",
      nota:"destinatari sbagliati: il modulo riguarda te e il professore"},
-    {logico:1, nome:"Mail", icona:"busta",
-     dest:"arriva a un indirizzo preciso, con allegato",
-     nota:"una persona sola, tono scolastico, e resta ritrovabile"},
     {logico:2, nome:"AirDrop", icona:"vicinanza",
      dest:"arriva ai dispositivi a pochi metri",
      nota:"alla sera, da casa, non c'è nessun dispositivo vicino"},
     {logico:3, nome:"Bacheca della scuola", icona:"globo",
      dest:"arriva a chiunque apra la pagina",
-     nota:"pubblicare non è consegnare, e il documento è personale"}
+     nota:"pubblicare non è consegnare, e il documento è personale"},
+    {logico:1, nome:"Mail", icona:"busta",
+     dest:"arriva a un indirizzo preciso, con allegato",
+     nota:"una persona sola, tono scolastico, e resta ritrovabile"}
   ];
 
   var h = '<div class="mk">' +
@@ -1846,7 +1928,7 @@ STIMOLI.svgOggettiConnessi = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 372" role="img" aria-label="Quattro oggetti di uso quotidiano collegati tutti allo stesso punto di rete">' +
+  '<svg viewBox="0 0 420 372" role="img" aria-label="Un orologio, un termostato, una lampada e un contatore, collegati tutti quanti allo stesso punto centrale contrassegnato dal simbolo del wi-fi">' +
     '<rect width="420" height="372" fill="#ffffff"/>' +
     filo(96, 96, 186, 158) +
     filo(324, 96, 234, 158) +
@@ -1855,7 +1937,9 @@ STIMOLI.svgOggettiConnessi = function(esplicativo){
     oggetto(20, 22, iconaOggetto("orologio"), 'Orologio') +
     oggetto(288, 22, iconaOggetto("termostato"), 'Termostato') +
     oggetto(20, 244, iconaOggetto("lampada"), 'Lampada') +
-    oggetto(288, 244, iconaOggetto("sensore"), 'Sensore') +
+    /* il quarto oggetto porta la sua identità concreta, non la categoria: «Sensore»
+       è una delle parole con cui la risposta corretta si formula */
+    oggetto(288, 244, iconaOggetto("sensore"), 'Contatore') +
     /* il punto di rete al centro */
     '<circle cx="210" cy="184" r="44" fill="#eef2fb" stroke="#123E90" stroke-width="2"/>' +
     '<g fill="none" stroke="#123E90" stroke-width="2.4" stroke-linecap="round">' +
@@ -1863,9 +1947,8 @@ STIMOLI.svgOggettiConnessi = function(esplicativo){
       '<path d="M202 186 a11 11 0 0 1 16 0"/>' +
     '</g>' +
     '<circle cx="210" cy="195" r="3.2" fill="#123E90"/>' +
-    /* il nome sta dentro il cerchio: fuori finirebbe addosso alle etichette dei fili */
-    '<text x="210" y="218" text-anchor="middle" font-family="Lexend, sans-serif" ' +
-      'font-size="12" font-weight="500" fill="#123E90">Rete</text>' +
+    /* il nodo centrale non è nominato: il glifo wi-fi dice già che cos'è, mentre la
+       parola «rete» è una di quelle con cui la risposta corretta si formula */
     /* le etichette dei fili stanno appena fuori dai riquadri, non al centro:
        al centro si sovrapponevano fra loro e al nome della rete */
     e('passi contati', 76, 120) +
@@ -2066,19 +2149,21 @@ STIMOLI.svgTestoAlternativo = function(esplicativo){
 /* In modalità prova ci sono il simbolo e la struttura della licenza, non che cosa
    permette e che cosa obbliga: quello si legge nella restituzione. */
 STIMOLI.svgLicenzaCC = function(esplicativo){
-  /* riga: il simbolo a sinistra, e a destra lo spazio di ciò che comporta */
-  function riga(y, simbolo, riga1, riga2){
-    var testo = '';
-    if(esplicativo){
-      testo =
-        '<text x="92" y="' + (y + 20) + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
+  /* riga: il simbolo a sinistra, e a destra ciò che comporta.
+     Anche in prova i due termini nudi sono scritti: «BY» non è una sigla che uno studente
+     di terza media possa ricavare da sé, e senza di essi l'item verificherebbe una
+     conoscenza pregressa specialistica invece di un ragionamento. Le conseguenze estese
+     — lo scopo commerciale, che cosa accade senza attribuzione — restano all'esplicativo. */
+  function riga(y, simbolo, breve, riga1, riga2){
+    var testo = esplicativo
+      ? '<text x="92" y="' + (y + 20) + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
           'font-size="12.5" fill="#16233a">' + riga1 + '</text>' +
         '<text x="92" y="' + (y + 37) + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
-          'font-size="12.5" fill="#16233a">' + riga2 + '</text>';
-    }
+          'font-size="12.5" fill="#16233a">' + riga2 + '</text>'
+      : '<text x="92" y="' + (y + 30) + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
+          'font-size="13.5" fill="#16233a">' + breve + '</text>';
     return '<rect x="76" y="' + y + '" width="326" height="48" rx="9" ' +
-             'fill="' + (esplicativo ? '#f6f8fc' : '#ffffff') + '" stroke="#d6e1f2" ' +
-             'stroke-width="1.6" stroke-dasharray="' + (esplicativo ? 'none' : '6 4') + '"/>' +
+             'fill="#f6f8fc" stroke="#d6e1f2" stroke-width="1.6"/>' +
            '<g transform="translate(44,' + (y + 24) + ')">' + simbolo + '</g>' +
            testo;
   }
@@ -2114,12 +2199,12 @@ STIMOLI.svgLicenzaCC = function(esplicativo){
     '<text x="216" y="151" font-family="Lexend, sans-serif" font-size="19" ' +
       'font-weight="700" fill="#123E90">CC BY</text>' +
     /* i due simboli ripresi uno per riga, con lo spazio di ciò che comportano */
-    riga(198, simboloCC,
+    riga(198, simboloCC, 'si può riusare',
          'si può copiare, modificare e riusare,',
          'senza limiti sullo scopo') +
-    riga(258, simboloBy,
+    riga(258, simboloBy, 'va indicato l\'autore',
          'a una sola condizione: indicare sempre',
-         'chi l\'ha realizzata') +
+         'chi l\'ha realizzata, quando viene ricondivisa') +
   '</svg>';
 };
 
@@ -2135,10 +2220,10 @@ STIMOLI.mkFormatiEsportazione = function(esplicativo, sceltaCorrente){
   var formati = [
     {logico:0, nome:"Pages",         est:".pages",
      nota:"resta modificabile, e si apre solo dove c\'è quest\'app"},
-    {logico:1, nome:"PDF",           est:".pdf",
-     nota:"impaginazione fissata: si vede uguale ovunque e non si riscrive"},
     {logico:2, nome:"Word",          est:".docx",
      nota:"si apre quasi ovunque, ma resta un documento da scrivere"},
+    {logico:1, nome:"PDF",           est:".pdf",
+     nota:"impaginazione fissata: si vede uguale ovunque e non si riscrive"},
     {logico:3, nome:"Testo semplice", est:".txt",
      nota:"solo i caratteri: perde impaginazione, immagini e tabelle"}
   ];
@@ -2375,16 +2460,16 @@ STIMOLI.mkPermessoPosizione = function(esplicativo, sceltaCorrente){
     '<circle cx="12" cy="8.8" r="2.8"/></g></svg>';
 
   var scelte = [
-    {logico:0, nome:"Consenti sempre",
-     nota:"la posizione resta accessibile anche quando l\'app è chiusa e tu stai " +
-          "facendo altro: molto più di quanto serva qui"},
-    {logico:1, nome:"Consenti mentre usi l\'app",
+    {logico:1, nome:"Consenti l\'accesso mentre usi l\'app",
      nota:"la posizione arriva quando l\'app è aperta e si interrompe quando la chiudi: " +
           "è esattamente il bisogno di questa giornata"},
-    {logico:2, nome:"Consenti una volta sola",
+    {logico:2, nome:"Consenti l\'accesso una volta sola",
      nota:"vale per questa singola apertura, quindi la richiesta si ripresenta a ogni " +
           "riapertura nel corso della giornata"},
-    {logico:3, nome:"Non consentire",
+    {logico:0, nome:"Consenti sempre l'accesso alla posizione",
+     nota:"la posizione resta accessibile anche quando l\'app è chiusa e tu stai " +
+          "facendo altro: molto più di quanto serva qui"},
+    {logico:3, nome:"Non consentire l'accesso alla posizione",
      nota:"senza posizione l\'app si apre, ma non può mostrarti se stai andando " +
           "nella direzione giusta"}
   ];
@@ -2412,14 +2497,11 @@ STIMOLI.mkPermessoPosizione = function(esplicativo, sceltaCorrente){
 /* ===== item 27 — il messaggio sospetto: quattro elementi tutti toccabili (hotspot) ===== */
 /* Tutti e quattro gli elementi sono presentati allo stesso modo, senza gerarchia: nessuno
    è evidenziato. L'anteprima del collegamento DEVE essere visibile anche in prova, perché
-   senza di essa l'item non è risolvibile — ma è un dato del messaggio, non un commento.
+   senza di essa l'item non è risolvibile — ma è un dato del messaggio, non un commento, e
+   ha lo stesso trattamento tipografico delle righe di dettaglio delle altre tre voci: se
+   fosse l'unica incorniciata, si sceglierebbe per il colore invece che per il contenuto.
    Indirizzi tutti inventati; nessun nome di prodotto reale. */
 STIMOLI.mkMessaggioSospetto = function(esplicativo, sceltaCorrente){
-  var catena = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' +
-    '<g fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round">' +
-    '<path d="M10 14 a4 4 0 0 0 5.7 0 l3 -3 a4 4 0 0 0 -5.7 -5.7 l-1.2 1.2"/>' +
-    '<path d="M14 10 a4 4 0 0 0 -5.7 0 l-3 3 a4 4 0 0 0 5.7 5.7 l1.2 -1.2"/></g></svg>';
-
   function riga(logico, capo, valore, extra, nota){
     var dentro = '<span class="msg-riga">' +
                  '<span class="capo-msg">' + capo + '</span>' +
@@ -2430,9 +2512,10 @@ STIMOLI.mkMessaggioSospetto = function(esplicativo, sceltaCorrente){
     return hotspot(logico, dentro, sceltaCorrente === logico);
   }
 
-  var anteprima = '<span class="anteprima-link">' + catena +
-    '<span>Il collegamento porta a<br><span class="vero">' +
-    'http://sf-verifica-utenti.area-clienti.example/login</span></span></span>';
+  function dettaglio(testo){ return '<span class="dettaglio-msg">' + testo + '</span>'; }
+
+  var anteprima = dettaglio('Il collegamento porta a ' +
+    'http://sf-verifica-utenti.area-clienti.example/login');
 
   return '' +
   '<div class="mk">' +
@@ -2442,13 +2525,13 @@ STIMOLI.mkMessaggioSospetto = function(esplicativo, sceltaCorrente){
     '<div class="elenco-msg">' +
       riga(0, "Da",
            'Registro della scuola &lt;avvisi@registro-sf.it&gt;',
-           '',
+           dettaglio('Instradato attraverso mail-out-7.invii.example'),
            "un indirizzo simile a quello vero, ma non identico: è un indizio serio, " +
            "non una prova — un sottodominio o un fornitore esterno possono somigliare " +
            "per motivi legittimi") +
       riga(1, "Oggetto",
            'Accesso in scadenza: conferma entro 24 ore o l\'account verrà bloccato',
-           '',
+           dettaglio('Ricevuto oggi alle 7:12 · scadenza indicata: domani alle 7:12'),
            "la fretta è la leva tipica di chi truffa, ma anche avvisi autentici hanno " +
            "scadenze vere: da sola l\'urgenza non dimostra niente") +
       riga(2, "Nel testo",
@@ -2459,7 +2542,7 @@ STIMOLI.mkMessaggioSospetto = function(esplicativo, sceltaCorrente){
            "servizio ha motivo di mascherare il proprio") +
       riga(3, "In fondo al messaggio",
            'Inserisci nome utente e password per confermare l\'account',
-           '',
+           dettaglio('Modulo di accesso · due campi da compilare e un pulsante di conferma'),
            "servizi veri chiedono davvero di rientrare con le credenziali dopo un " +
            "cambio di password o un accesso nuovo: conta dove finiscono, non che " +
            "vengano chieste") +
@@ -2471,8 +2554,9 @@ STIMOLI.mkMessaggioSospetto = function(esplicativo, sceltaCorrente){
 };
 
 /* ===== item 28 — lo stesso messaggio in quattro punti del percorso ===== */
-/* In modalità prova nessuna didascalia spiega che cosa si veda: che il contenuto sia
-   leggibile ai due capi e illeggibile in mezzo si deve ricavare guardando le bolle. */
+/* In modalità prova il contenuto NON si legge in nessuna delle quattro stazioni: si vede
+   che il messaggio attraversa quattro punti e che vi transita in forma indistinta. Dove
+   torni leggibile è esattamente la risposta, e compare solo in modalità esplicativa. */
 STIMOLI.svgMessaggioCifrato = function(esplicativo){
   var e = function(testo, x, y, ancora){ return etichettaSvg(esplicativo, testo, x, y, ancora); };
 
@@ -2508,7 +2592,7 @@ STIMOLI.svgMessaggioCifrato = function(esplicativo){
            e(nota, 372, y + 30, 'end') +
            '<rect x="78" y="' + (y + 40) + '" width="294" height="32" rx="10" fill="#ffffff" ' +
              'stroke="#d6e1f2" stroke-width="1.6"/>' +
-           (leggibile
+           ((leggibile && esplicativo)
              ? '<text x="92" y="' + (y + 61) + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
                'font-size="14" fill="#16233a">Ci vediamo alle 18 davanti al museo</text>'
              : blocchi(92, y + 51));
@@ -2522,7 +2606,9 @@ STIMOLI.svgMessaggioCifrato = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 430" role="img" aria-label="Lo stesso messaggio in quattro punti del percorso: leggibile a chi scrive e a chi riceve, formato da blocchi indistinti nei due passaggi intermedi">' +
+  '<svg viewBox="0 0 420 430" role="img" aria-label="' + (esplicativo
+      ? 'Lo stesso messaggio in quattro punti del percorso: leggibile a chi scrive e a chi riceve, formato da blocchi indistinti nei due passaggi intermedi'
+      : 'Lo stesso messaggio in quattro punti del percorso: in ciascuno appare come una fila di blocchi indistinti') + '">' +
     '<rect width="420" height="430" fill="#ffffff"/>' +
     frecciaGiu(210, 96, 122) +
     frecciaGiu(210, 202, 228) +
@@ -2541,18 +2627,18 @@ STIMOLI.svgMessaggioCifrato = function(esplicativo){
    delle quattro combinazioni è marcata in modalità prova. */
 STIMOLI.mkModuloConsensi = function(esplicativo, sceltaCorrente){
   var combinazioni = [
-    {logico:0, prima:true,  seconda:true,  et:"Spunto entrambe le caselle",
-     nota:"concede anche ciò che non serve allo scopo: la pubblicità e il passaggio " +
-          "dei dati ad altre società non hanno a che fare con il laboratorio"},
-    {logico:1, prima:true,  seconda:false, et:"Spunto solo la prima",
-     nota:"dà il consenso necessario al servizio che hai chiesto e nega quello " +
-          "facoltativo: l\'iscrizione si perfeziona, la pubblicità no"},
-    {logico:2, prima:false, seconda:true,  et:"Spunto solo la seconda",
+    {logico:3, prima:false, seconda:false, et:"Non spunto nessuna delle due caselle",
+     nota:"blocca l\'iscrizione: il museo non può registrarti né avvisarti se " +
+          "il laboratorio cambia orario"},
+    {logico:2, prima:false, seconda:true,  et:"Spunto soltanto la seconda casella",
      nota:"nega il necessario e concede il superfluo: senza il primo consenso " +
           "l\'iscrizione non può essere registrata"},
-    {logico:3, prima:false, seconda:false, et:"Non spunto nessuna delle due",
-     nota:"blocca l\'iscrizione: il museo non può registrarti né avvisarti se " +
-          "il laboratorio cambia orario"}
+    {logico:1, prima:true,  seconda:false, et:"Spunto soltanto la prima casella",
+     nota:"dà il consenso necessario al servizio che hai chiesto e nega quello " +
+          "facoltativo: l\'iscrizione si perfeziona, la pubblicità no"},
+    {logico:0, prima:true,  seconda:true,  et:"Spunto tutte e due le caselle",
+     nota:"concede anche ciò che non serve allo scopo: la pubblicità e il passaggio " +
+          "dei dati ad altre società non hanno a che fare con il laboratorio"}
   ];
 
   var h = '<div class="mk">' +
@@ -2591,22 +2677,26 @@ STIMOLI.mkModuloConsensi = function(esplicativo, sceltaCorrente){
 };
 
 /* ===== item 30 — la foto e la scheda di dati che si porta dietro ===== */
-/* In modalità prova i campi ci sono e i valori no: si deve vedere CHE esistono dati
-   nascosti, non quali siano. Sapere quali è già metà della risposta. */
+/* In modalità prova sono coperti sia i valori sia i NOMI dei campi: il riquadro deve dire
+   che esiste un pannello di dati che la foto non mostra, non elencarne il contenuto —
+   «data», «coordinate», «dispositivo» sono già l'enumerazione della risposta. */
 STIMOLI.svgFotoDatiNascosti = function(esplicativo){
   var campi = [
-    {nome:"Data e ora",   valore:"12 marzo 2026, 16:42",       largh:132},
-    {nome:"Coordinate",   valore:"45.4012 N · 9.9231 E",       largh:122},
-    {nome:"Luogo",        valore:"Orzinuovi (BS)",             largh:92},
-    {nome:"Dispositivo",  valore:"iPad, fotocamera posteriore",largh:158},
-    {nome:"Dimensioni",   valore:"4032 × 3024 punti",          largh:112}
+    {nome:"Data e ora",   valore:"12 marzo 2026, 16:42",       largh:132, larghNome:70},
+    {nome:"Coordinate",   valore:"45.4012 N · 9.9231 E",       largh:122, larghNome:72},
+    {nome:"Luogo",        valore:"Orzinuovi (BS)",             largh:92,  larghNome:40},
+    {nome:"Dispositivo",  valore:"iPad, fotocamera posteriore",largh:158, larghNome:78},
+    {nome:"Dimensioni",   valore:"4032 × 3024 punti",          largh:112, larghNome:74}
   ];
 
   var righe = '';
   for(var i=0;i<campi.length;i++){
     var y = 274 + i * 30;
-    righe += '<text x="48" y="' + y + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
-               'font-size="13" fill="#5a6b7c">' + campi[i].nome + '</text>';
+    righe += esplicativo
+      ? '<text x="48" y="' + y + '" font-family="Atkinson Hyperlegible, sans-serif" ' +
+        'font-size="13" fill="#5a6b7c">' + campi[i].nome + '</text>'
+      : '<rect x="48" y="' + (y - 11) + '" width="' + campi[i].larghNome +
+        '" height="13" rx="4" fill="#dde5f2"/>';
     righe += esplicativo
       ? '<text x="374" y="' + y + '" text-anchor="end" ' +
         'font-family="Atkinson Hyperlegible, sans-serif" font-size="12.5" fill="#16233a">' +
@@ -2616,7 +2706,9 @@ STIMOLI.svgFotoDatiNascosti = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 434" role="img" aria-label="Una fotografia e, sotto, un pannello di informazioni con cinque campi il cui contenuto non è visibile">' +
+  '<svg viewBox="0 0 420 434" role="img" aria-label="' + (esplicativo
+      ? 'Una fotografia e, sotto, un pannello con cinque informazioni: data e ora, coordinate, luogo, dispositivo, dimensioni'
+      : 'Una fotografia e, sotto, un pannello di informazioni del file con cinque righe, di cui non si legge né il nome né il contenuto') + '">' +
     '<rect width="420" height="434" fill="#ffffff"/>' +
     /* la fotografia: una scena qualunque, non è lei l'oggetto della domanda */
     '<rect x="90" y="16" width="240" height="170" rx="10" fill="#eef2fb" stroke="#123E90" ' +
@@ -2641,14 +2733,23 @@ STIMOLI.svgFotoDatiNascosti = function(esplicativo){
 STIMOLI.svgFirewallConfine = function(esplicativo){
   var e = function(testo, x, y, ancora){ return etichettaSvg(esplicativo, testo, x, y, ancora); };
 
+  /* in modalità prova tutte e quattro le connessioni entrano nella fascia e nessuna
+     si vede uscire: che qualcosa venga selezionato resta implicito nella fascia stessa.
+     Quali proseguano, e con quale criterio, è esattamente la risposta e compare dopo. */
+  function entra(y){
+    return '<path d="M126 ' + y + ' H220" stroke="#1f5fc0" stroke-width="2.4" fill="none"/>' +
+           '<circle cx="164" cy="' + y + '" r="4" fill="#1f5fc0"/>';
+  }
   /* connessione che attraversa il confine e arriva dall'altra parte */
   function passa(y){
+    if(!esplicativo) return entra(y);
     return '<path d="M126 ' + y + ' H282" stroke="#1f5fc0" stroke-width="2.4" fill="none"/>' +
            '<path d="M281 ' + (y - 6) + ' L293 ' + y + ' L281 ' + (y + 6) + ' Z" fill="#1f5fc0"/>' +
            '<circle cx="164" cy="' + y + '" r="4" fill="#1f5fc0"/>';
   }
   /* connessione che si ferma al confine: il segno è in ambra, mai in rosso */
   function ferma(y){
+    if(!esplicativo) return entra(y);
     return '<path d="M126 ' + y + ' H176" stroke="#8fa2bd" stroke-width="2.4" fill="none"/>' +
            '<circle cx="164" cy="' + y + '" r="4" fill="#8fa2bd"/>' +
            '<g fill="none" stroke="#B8860B" stroke-width="2.4" stroke-linecap="round">' +
@@ -2664,7 +2765,9 @@ STIMOLI.svgFirewallConfine = function(esplicativo){
   }
 
   return '' +
-  '<svg viewBox="0 0 420 384" role="img" aria-label="Fra la rete e il dispositivo c\'è una fascia continua: due connessioni la attraversano e arrivano al dispositivo, altre due si fermano contro di essa">' +
+  '<svg viewBox="0 0 420 384" role="img" aria-label="' + (esplicativo
+      ? 'Fra la rete e il dispositivo c\'è una fascia continua: due connessioni la attraversano e arrivano al dispositivo, altre due si fermano contro di essa'
+      : 'Fra la rete e il dispositivo c\'è una fascia continua: quattro connessioni partono dalla rete ed entrano nella fascia') + '">' +
     '<rect width="420" height="384" fill="#ffffff"/>' +
     /* la rete, a sinistra */
     '<rect x="12" y="14" width="114" height="356" rx="12" fill="#f6f8fc" stroke="#123E90" ' +
@@ -2717,24 +2820,24 @@ STIMOLI.mkSequenzaDueFattori = function(esplicativo, sceltaCorrente){
             "Indica il numero di telefono fidato e concludi l\'attivazione."],
      nota:"l\'ordine è impossibile: il codice non esiste finché non c\'è un recapito " +
           "a cui mandarlo, quindi non può essere chiesto per primo"},
-    {logico:1, capo:"Sequenza 2",
-     passi:[PRIMO,
-            "Indica un numero di telefono fidato e scegli come ricevere il codice.",
-            "Inserisci il codice ricevuto e conferma l\'attivazione."],
-     nota:"stabilisce prima il recapito e poi lo verifica ricevendoci sopra il codice: " +
-          "il secondo fattore è una strada davvero separata dalla password"},
-    {logico:2, capo:"Sequenza 3",
+    {logico:2, capo:"Sequenza 2",
      passi:[PRIMO,
             "Conferma la password dell\'account per proseguire.",
             "Tocca «Attiva» e concludi senza altri passaggi."],
      nota:"manca il secondo fattore: senza alcun recapito di sicurezza l\'account resta " +
           "appeso alla sola password, cioè protetto come prima"},
-    {logico:3, capo:"Sequenza 4",
+    {logico:3, capo:"Sequenza 3",
      passi:[PRIMO,
             "Indica come recapito la casella di posta dell\'Apple ID stesso.",
             "Inserisci il codice ricevuto in quella casella e conferma."],
      nota:"il secondo fattore arriva dentro l\'account che dovrebbe proteggere: " +
-          "chi riesce a entrare in quell\'account riceve anche il codice"}
+          "chi riesce a entrare in quell\'account riceve anche il codice"},
+    {logico:1, capo:"Sequenza 4",
+     passi:[PRIMO,
+            "Indica un numero di telefono fidato e scegli come ricevere il codice.",
+            "Inserisci il codice ricevuto e conferma l\'attivazione."],
+     nota:"stabilisce prima il recapito e poi lo verifica ricevendoci sopra il codice: " +
+          "il secondo fattore è una strada davvero separata dalla password"}
   ];
 
   var h = '<div class="mk">' +
@@ -3151,14 +3254,6 @@ function hotspot(indiceLogico, contenuto, selezionato){
          '<span class="segna">scelta</span>' + contenuto + '</button>';
 }
 
-/* ===== SEGNAPOSTO SCHERMATE NON ANCORA COSTRUITE ===== */
-// Conferma e Restituzione arrivano nei task 15 e 17: finché non esistono, il router
-// deve mostrare un avviso onesto invece di lanciare un errore su "Vai alla consegna".
-function segnaposto(nomeSezione){
-  return '<div class="card"><h2>Schermata non ancora disponibile</h2>' +
-         '<p class="lead">La sezione "' + nomeSezione + '" non è ancora stata costruita.</p></div>';
-}
-
 /* ===== RENDER ===== */
 var Render = (function(){
   var SCHERMATE = {
@@ -3166,20 +3261,16 @@ var Render = (function(){
     identificazione:function(){ return Identificazione.html(); },
     consegna:       function(){ return Consegna.html(); },
     prova:          function(){ return provaHtml(); },
-    conferma:       function(){
-      return (typeof Conferma !== "undefined") ? Conferma.html() : segnaposto("consegna finale");
-    },
-    restituzione:   function(){
-      return (typeof Restituzione !== "undefined") ? Restituzione.html() : segnaposto("restituzione dei risultati");
-    }
+    conferma:       function(){ return Conferma.html(); },
+    restituzione:   function(){ return Restituzione.html(); }
   };
   var LEGA = {
     video:          function(){ Video.monta(); Video.lega(); },
     identificazione:function(){ Identificazione.lega(); },
     consegna:       function(){ Consegna.lega(); },
     prova:          legaProva,
-    conferma:       function(){ if(typeof Conferma !== "undefined") Conferma.lega(); },
-    restituzione:   function(){}
+    conferma:       function(){ Conferma.lega(); },
+    restituzione:   function(){ Restituzione.lega(); }
   };
 
   function disegna(){
@@ -3240,6 +3331,216 @@ function legaProva(){
     Stato.vaiA("conferma");
   });
 }
+
+/* ===== CONFERMA ===== */
+var Conferma = (function(){
+
+  // indici (0-based) delle domande rimaste in bianco
+  function mancanti(){
+    var m = [];
+    for(var i=0;i<ITEMS.length;i++)
+      if(Stato.s.risposte[i] === null || Stato.s.risposte[i] === undefined) m.push(i);
+    return m;
+  }
+
+  function html(){
+    var m = mancanti();
+    var h = '<div class="card"><h2>Prima di consegnare</h2>';
+
+    if(m.length > 0){
+      // ambra, mai rosso: segnala senza colpevolizzare, e dice QUALI domande sono
+      // rimaste in bianco così lo studente non deve ricontrollarle tutte a mano
+      h += '<div class="avviso avviso-ambra">' +
+           '<span><strong>' + (m.length === 1 ?
+             'C\'è 1 domanda senza risposta.' :
+             'Ci sono ' + m.length + ' domande senza risposta.') +
+           '</strong> Puoi tornare indietro e completarle: una domanda lasciata in bianco ' +
+           'conta come non risposta. Tocca un numero per andare direttamente lì.</span>' +
+           '<div class="mancanti">';
+      for(var k=0;k<m.length;k++){
+        h += '<button class="q" data-vai="' + m[k] + '" ' +
+             'aria-label="Vai alla domanda ' + (m[k]+1) + ', rimasta senza risposta">' +
+             (m[k]+1) + '</button>';
+      }
+      h += '</div></div>';
+    } else {
+      h += '<p class="lead">Hai risposto a tutte e 32 le domande.</p>';
+    }
+
+    h += '<p>Una volta consegnato non si torna indietro. Riceverai subito il tuo livello ' +
+         'e la spiegazione delle domande su cui il ragionamento si è inceppato.</p>';
+    h += '<p><button class="btn secondario" id="torna">Torna alle domande</button> ' +
+         '<button class="btn" id="consegna">Consegna la prova</button></p></div>';
+    return h;
+  }
+
+  function lega(){
+    // stesso meccanismo data-vai della mappa in legaProva
+    var salti = document.querySelectorAll("[data-vai]");
+    for(var j=0;j<salti.length;j++){
+      salti[j].addEventListener("click", function(){
+        Stato.s.corrente = parseInt(this.getAttribute("data-vai"), 10);
+        Stato.vaiA("prova");
+      });
+    }
+    document.getElementById("torna").addEventListener("click", function(){
+      Stato.vaiA("prova");
+    });
+    document.getElementById("consegna").addEventListener("click", function(){
+      Stato.chiudi();
+      Export.invia(Stato.risultato());
+      Stato.vaiA("restituzione");
+    });
+  }
+
+  return {html:html, lega:lega, mancanti:mancanti};
+})();
+
+/* ===== EXPORT ===== */
+// Trasporto a pixel GET verso Apps Script: niente CORS, funziona anche con CSP
+// restrittiva. Lo schema del foglio e le istruzioni di deploy stanno in apps-script.gs.
+var Export = (function(){
+  var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbym1ORSyJd-F4ysZnAg7DzAIJBU4e57reXlAxIlNV0u3v8aR4hBz8wRfdk7VxrViNiN/exec";
+
+  function invia(r){
+    // finché il docente non ha incollato l'URL della distribuzione, l'invio è un no-op:
+    // la prova deve funzionare comunque, senza errori in console
+    if(URL_SCRIPT.indexOf("INCOLLA") === 0) return;
+
+    var p = new URLSearchParams();
+    p.set("ts", new Date().toISOString());
+    p.set("nome", Stato.dati.nome);
+    p.set("cognome", Stato.dati.cognome);
+    p.set("classe", Stato.dati.classe);
+    p.set("durata", String(r.durata));
+    // le opzioni sono mescolate per studente: nel foglio va l'INDICE LOGICO (la
+    // posizione originale dell'opzione), non la lettera vista a schermo, altrimenti
+    // due tentativi non sono confrontabili
+    p.set("risposte", Stato.s.risposte.map(function(x){
+      return (x === null || x === undefined) ? "-" : String(x);
+    }).join(""));
+    p.set("esiti", r.esiti.join(""));
+    p.set("liv_a1", r.aree[1]);
+    p.set("liv_a2", r.aree[2]);
+    p.set("liv_a3", r.aree[3]);
+    p.set("liv_a4", r.aree[4]);
+    p.set("liv_glob", r.globale);
+
+    new Image().src = URL_SCRIPT + "?" + p.toString();
+  }
+
+  return {invia:invia};
+})();
+
+/* ===== RESTITUZIONE ===== */
+var Restituzione = (function(){
+
+  // il nome è testo digitato dallo studente: va nell'HTML, quindi va neutralizzato
+  function esc(t){
+    return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function badge(liv){
+    var cls = liv === "Avanzato" ? "av" :
+              liv === "Intermedio" ? "in" :
+              liv === "Base" ? "ba" : "pa";
+    return '<span class="livello ' + cls + '">' + liv + '</span>';
+  }
+
+  // sta qui e non fuori: la revisione ha un solo consumatore, la restituzione
+  function revisioneHtml(r){
+    var h = '<div class="card"><h2>Le domande da rivedere</h2>';
+    var quante = 0, i;
+    for(i=0;i<ITEMS.length;i++) if(!r.esiti[i]) quante++;
+
+    if(!quante) return h + '<p class="lead">Tutte le risposte sono corrette. ' +
+                            'Non c\'è nulla da rivedere.</p></div>';
+
+    h += '<p class="lead">Sono ' + quante + '. Per ognuna trovi che cosa non ha funzionato ' +
+         'e perché la risposta corretta è quella.</p>';
+
+    for(i=0;i<ITEMS.length;i++){
+      if(r.esiti[i]) continue;
+      var it = ITEMS[i];
+      var data = Stato.s.risposte[i];
+      if(data === undefined) data = null;
+
+      h += '<div class="rev"><div class="split">';
+      h += '<div><span class="tag">Domanda ' + (i+1) + ' · ' + nomeArea(it.area) + '</span>';
+      if(it.inquadramento) h += '<div class="inquadramento">' + it.inquadramento + '</div>';
+      h += '<p class="domanda">' + it.consegna + '</p>';
+
+      if(data === null){
+        h += '<p class="tua tua-vuota"><span>Questa domanda è rimasta senza risposta.</span></p>';
+      } else {
+        h += '<p class="tua"><strong>La tua risposta:</strong> ' + it.opzioni[data] +
+             '<br><span class="perche">' + it.misconcetti[data] + '</span></p>';
+      }
+      h += '<p class="giusta"><strong>Risposta corretta:</strong> ' +
+           it.opzioni[it.corretta] + '</p>';
+      h += '<p class="spiega">' + it.feedback + '</p></div>';
+      // true = pannello ESPLICATIVO: lo stimolo mostra le note che durante la prova
+      // erano nascoste. È il perno didattico della restituzione.
+      h += '<aside class="stimolo"><h3>' + it.stimolo.titolo + '</h3>' +
+           STIMOLI[it.stimolo.render](true) + '</aside>';
+      h += '</div></div>';
+    }
+    return h + '</div>';
+  }
+
+  function html(){
+    var r = Stato.risultato();
+    var h = '<div class="card"><h2>Il tuo livello</h2>' +
+            '<p class="lead">' + esc(Stato.dati.nome) + ' ' + esc(Stato.dati.cognome) +
+            ' · classe ' + esc(Stato.dati.classe) + '</p>' +
+            '<div class="livello-grande">' + badge(r.globale) + '</div>' +
+            '<p>Questo non è un voto: è il livello di competenza che questa prova ha ' +
+            'messo in evidenza oggi. La prova si può ripetere: serve a vedere come cresci.</p>' +
+            '</div>';
+
+    h += '<div class="card"><h2>Le quattro aree</h2><div class="aree">';
+    for(var a=1;a<=4;a++){
+      var c = Stato.conteggi(a);
+      h += '<div class="area-box"><h3>' + nomeArea(a) + '</h3>' +
+           badge(r.aree[a]) +
+           '<p class="dettaglio">Base ' + c.Base + '/3 · Intermedio ' + c.Intermedio +
+           '/3 · Avanzato ' + c.Avanzato + '/2</p></div>';
+    }
+    h += '</div>' +
+         '<p class="nota">Con 8 domande per area, il livello di area è un\'<strong>indicazione' +
+         '</strong> su dove conviene lavorare, non una misura precisa. Il livello complessivo ' +
+         'qui sopra è più solido.</p></div>';
+
+    h += revisioneHtml(r);
+
+    // la restituzione è lunga e si legge una volta sola: il rilancio sta in fondo,
+    // dove il ragazzo arriva dopo aver letto tutto
+    h += '<div class="card ricomincia"><h2>Rifare la prova</h2>' +
+         '<p class="lead">La prova si può ripetere durante l\'anno. Ricominciando, le domande ' +
+         'restano le stesse ma le risposte vengono rimescolate.</p>' +
+         '<p><button class="btn" id="ricomincia">Ricomincia da capo</button></p></div>';
+
+    return h;
+  }
+
+  function lega(){
+    document.getElementById("ricomincia").addEventListener("click", function(){
+      // Stato.dati è esposto per riferimento: vanno azzerate le proprietà, non
+      // riassegnato l'oggetto, altrimenti Stato.dati punterebbe al vecchio
+      Stato.dati.nome = "";
+      Stato.dati.cognome = "";
+      Stato.dati.classe = "";
+      Stato.s.permutazioni = [];
+      Stato.s.risposte = [];
+      Stato.s.corrente = 0;
+      Stato.s.inizio = 0;
+      Stato.s.fine = 0;
+      Stato.vaiA("identificazione");
+    });
+  }
+
+  return {html:html, lega:lega};
+})();
 
 if(location.search.indexOf("selftest=1") === -1){
   document.addEventListener("DOMContentLoaded", Render.disegna);
@@ -3482,6 +3783,77 @@ var SelfTest = (function(){
         assertEq(it.stimolo.tipo, "mockup", "un hotspot vive solo dentro un mockup, item " + it.id);
       }
     }
+  });
+
+  /* --- scorciatoie da test: la risposta giusta non deve essere indovinabile --- */
+  // "quando non sai, scegli la più lunga" è l'euristica più insegnata nei corsi per i
+  // test: se la corretta è sistematicamente la più lunga, la prova misura la scaltrezza
+  // invece della competenza. Lo shuffle non protegge: la lunghezza non cambia permutando.
+  test("la corretta non è quasi sempre l'opzione più lunga", function(){
+    assert(ITEMS.length > 0, "ITEMS è vuoto: gli altri test non significano nulla");
+    var quanti = 0;
+    for(var i=0;i<ITEMS.length;i++){
+      var L = [], k;
+      for(k=0;k<4;k++) L.push(ITEMS[i].opzioni[k].length);
+      var max = Math.max.apply(null, L), min = Math.min.apply(null, L);
+      if(L[ITEMS[i].corretta] === max) quanti++;
+      assert((max - min) / min <= 0.25,
+             "opzioni troppo squilibrate sull'item " + ITEMS[i].id +
+             ": da " + min + " a " + max + " caratteri");
+    }
+    assert(quanti <= 8, "la corretta è l'opzione più lunga in " + quanti +
+           " item su 32: è la scorciatoia che si insegna nei corsi per i test");
+  });
+
+  // negli item con hotspot le opzioni NON vengono mescolate: l'ordine con cui gli
+  // elementi compaiono nel mockup è fisso, quindi va contata la posizione VISIVA —
+  // l'ordine dei data-logico nell'HTML prodotto — e non l'indice logico dell'array.
+  test("negli item con hotspot la posizione corretta è distribuita", function(){
+    assert(ITEMS.length > 0, "ITEMS è vuoto: gli altri test non significano nulla");
+    var d = [0,0,0,0], n = 0, i, j;
+    for(i=0;i<ITEMS.length;i++){
+      var it = ITEMS[i];
+      if(!it.stimolo.hotspot) continue;
+      n++;
+      var html = STIMOLI[it.stimolo.render](false);
+      var logici = [], re = /data-logico="(\d+)"/g, m;
+      while((m = re.exec(html)) !== null) logici.push(parseInt(m[1], 10));
+      assertEq(logici.length, 4,
+               "il mockup dell'item " + it.id + " deve disegnare 4 hotspot");
+      var ordinati = logici.slice().sort();
+      assertEq(ordinati.join(","), "0,1,2,3",
+               "i data-logico dell'item " + it.id + " non coprono 0,1,2,3");
+      var pos = -1;
+      for(j=0;j<4;j++) if(logici[j] === it.corretta) pos = j;
+      assert(pos !== -1, "l'hotspot corretto manca dal mockup dell'item " + it.id);
+      d[pos]++;
+    }
+    assert(n >= 10, "item con hotspot attesi: almeno 10, trovati " + n);
+    for(j=0;j<4;j++)
+      assert(d[j] <= Math.ceil(n/2),
+             "troppe corrette nella posizione visiva " + j +
+             " (" + d[j] + " su " + n + "): distribuzione " + d.join("/"));
+  });
+
+  /* --- export --- */
+  // se questa mappa si rompe il foglio si riempie di dati sbagliati in silenzio
+  test("l'export registra l'indice logico, non la lettera mostrata", function(){
+    assert(ITEMS.length > 0, "ITEMS è vuoto: gli altri test non significano nulla");
+    Stato.iniziaProva();
+    var i = 0;
+    var p = Stato.s.permutazioni[i];
+    var posMostrata = 2;                       // lo studente tocca la lettera C
+    var logico = p[posMostrata];
+    Stato.rispondi(i, logico);
+    assertEq(Stato.s.risposte[i], logico,
+             "in stato va l'indice logico, non la posizione " + posMostrata);
+
+    Stato.rispondi(i, ITEMS[i].corretta);
+    assertEq(Stato.esiti()[i], 1, "la risposta corretta deve risultare corretta");
+
+    var sbagliato = (ITEMS[i].corretta + 1) % 4;
+    Stato.rispondi(i, sbagliato);
+    assertEq(Stato.esiti()[i], 0, "una risposta diversa dalla corretta non deve valere");
   });
 
   function esegui(){
